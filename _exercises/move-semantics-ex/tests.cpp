@@ -27,7 +27,7 @@ TEST_CASE("Moving text shape")
 TEST_CASE("ShapeGroup")
 {      
     ShapeGroup sg;
-    //sg.add(std::make_unique<Text>(10, 20, "text")); // uncomment this line
+    sg.add(std::make_unique<Text>(10, 20, "text")); // uncomment this line
 
     REQUIRE(sg.shapes.size() == 1);
 

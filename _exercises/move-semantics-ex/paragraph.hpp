@@ -47,6 +47,22 @@ namespace LegacyCode
             return *this;
         }
 
+        Paragraph(Paragraph&& p)
+            : buffer_(p.buffer_)
+        {
+            p.buffer_ = nullptr;
+        }
+
+        Paragraph& operator=(Paragraph&& p)
+        {
+            if(this != &p)
+            {
+                Paragraph temp = std::move(p);
+                swap(temp);
+            }
+            return *this;
+        }
+
         void set_paragraph(const char* txt)
         {
             std::strcpy(buffer_, txt);
@@ -119,7 +135,10 @@ struct ShapeGroup : public Shape
             s->draw();
     }
 
-    // TODO - implement adding a shape to a shapes container
+    void add(std::unique_ptr<Shape> ptr)
+    {
+        shapes.push_back(std::move(ptr));
+    }
 };
 
 #endif /*PARAGRAPH_HPP_*/
