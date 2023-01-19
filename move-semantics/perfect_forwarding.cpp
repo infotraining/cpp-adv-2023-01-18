@@ -14,19 +14,19 @@ using namespace Helpers;
 
 void have_fun(Gadget& g)
 {
-    puts(__PRETTY_FUNCTION__);
+    std::cout << __PRETTY_FUNCTION__ << "\n";
     g.use();
 }
 
 void have_fun(const Gadget& cg)
 {
-    puts(__PRETTY_FUNCTION__);
+    std::cout << __PRETTY_FUNCTION__ << "\n";
     cg.use();
 }
 
 void have_fun(Gadget&& g)
 {
-    puts(__PRETTY_FUNCTION__);
+    std::cout << __PRETTY_FUNCTION__ << "\n";
     g.use();
 }
 
@@ -46,14 +46,59 @@ namespace WithoutPerfectForwarding
     {
         have_fun(std::move(g));
     }
+
 } // namespace WithoutPerfectForwarding
 
-TEST_CASE("using gadget")
+namespace WithPerfectForwarding
+{
+    namespace Cpp20
+    {
+        void use(auto&& g) // g is universal reference
+        {
+            have_fun(std::forward<decltype(g)>(g));
+        }
+    } // namespace Cpp20
+
+    namespace Explain
+    {
+        template <typename T>
+        decltype(auto) forward(T& item)
+        {
+            if constexpr (std::is_reference_v<T>)
+            {
+                std::cout << __PRETTY_FUNCTION__ << "\n";
+                return item;
+            }
+            else
+            {
+                std::cout << __PRETTY_FUNCTION__ << "\n";
+                return std::move(item);
+            }
+        }
+    } // namespace Explain
+
+    template <typename TGadget>
+    void use(TGadget&& g) // g is universal reference
+    {
+        have_fun(std::forward<TGadget>(g));
+    }
+} // namespace WithPerfectForwarding
+
+TEST_CASE("universal reference + auto")
+{
+    auto x = 10; // int
+
+    auto&& ax1 = x; // int&
+
+    auto&& ax2 = x + x; // int&&
+}
+
+TEST_CASE("using gadget - perfect forwarding")
 {
     Gadget g{1, "g"};
     const Gadget cg{2, "const g"};
 
-    using WithoutPerfectForwarding::use;
+    using WithPerfectForwarding::use;
 
     use(g);
     use(cg);
