@@ -5,7 +5,14 @@ using namespace std::literals;
 
 std::string full_name(const std::string& first_name, const std::string& last_name)
 {
-    return first_name + " " + last_name;
+    return first_name + " " + last_name; // prvalue
+}
+
+TEST_CASE("copy ellison")
+{
+    std::string person = full_name("Adam", "Nowak");
+
+    std::string other = "jan nowak";
 }
 
 TEST_CASE("reference binding")

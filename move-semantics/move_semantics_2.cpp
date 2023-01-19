@@ -1,4 +1,5 @@
 #include "gadget.hpp"
+#include <atomic>
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -80,8 +81,10 @@ Explain::unique_ptr<Helpers::Gadget> create_gadget()
     static int id_gen = 0;
     const int id = ++id_gen;
 
-    Explain::unique_ptr<Helpers::Gadget> ptr_g{new Helpers::Gadget{id, "Gadget#" + std::to_string(id)}};
-    return ptr_g;
+    // Explain::unique_ptr<Helpers::Gadget> ptr_g{new Helpers::Gadget{id, "Gadget#" + std::to_string(id)}};
+    // return ptr_g; // l-value
+
+    return Explain::unique_ptr<Helpers::Gadget>{new Helpers::Gadget{id, "Gadget#" + std::to_string(id)}}; // prvalue
 }
 
 
@@ -116,4 +119,25 @@ TEST_CASE("move semantics - vector of unique_ptrs")
 
     for(const auto& ptr_g : ptrs)
         ptr_g->use();
+}
+
+std::atomic<int> create_counter(int start)
+{
+    return std::atomic<int>{start};
+}
+
+void run(std::atomic<int> counter)
+{
+    ++counter;
+}
+
+TEST_CASE("std:atomic")
+{
+    std::atomic<int> counter{0};
+
+    // auto backup = counter; // nocopyable
+    // auto target = std::move(counter); 
+
+    std::atomic<int> other_counter = create_counter(100);
+    run(create_counter(0));
 }

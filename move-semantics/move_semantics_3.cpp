@@ -223,6 +223,10 @@ TEST_CASE("noexcept")
 
     vec.push_back(create_data_set());
     vec.push_back(Data{"ds2", {1, 2, 3}});
+    std::cout << "---------\n";
     vec.push_back(Data{"ds3", {1, 2, 3}});
+    std::cout << "---------\n";
     vec.push_back(Data{"ds4", {1, 2, 3}});
+    std::cout << "---------\n";
+    vec.push_back(Data{"ds5", {1, 2, 3}});
 }
