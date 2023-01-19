@@ -1,18 +1,18 @@
 #include "utils.hpp"
 
-#include <catch2/catch_test_macros.hpp>
-#include <memory>
-#include <vector>
-#include <string>
-#include <iostream>
-#include <cstring>
 #include <array>
+#include <catch2/catch_test_macros.hpp>
+#include <cstring>
+#include <iostream>
+#include <memory>
 #include <optional>
+#include <string>
+#include <vector>
 
 using Utils::Gadget;
 using namespace std::literals;
 
-template <typename T> 
+template <typename T>
 T maximum(T a, T b)
 {
     return a < b ? b : a;
@@ -20,7 +20,7 @@ T maximum(T a, T b)
 
 const char* maximum(const char* a, const char* b)
 {
-    return std::strcmp(a, b) < 0 ? b : a; 
+    return std::strcmp(a, b) < 0 ? b : a;
 }
 
 namespace Alt
@@ -30,12 +30,12 @@ namespace Alt
     {
         return a < b ? b : a;
     }
-}
+} // namespace Alt
 
 template <typename InpIter, typename OutIter, typename Predicate>
 OutIter my_copy_if(InpIter first, InpIter last, OutIter dest, Predicate pred)
 {
-    for(InpIter it = first; it != last; ++it)
+    for (InpIter it = first; it != last; ++it)
     {
         if (pred(*it))
         {
@@ -73,8 +73,10 @@ struct ValuePair
 
     ValuePair() = default;
 
-    ValuePair(T1 fst, T2 snd) : first{fst}, second{snd}
-    {}
+    ValuePair(T1 fst, T2 snd)
+        : first{fst}
+        , second{snd}
+    { }
 
     std::string to_string() const
     {
@@ -97,7 +99,7 @@ TEST_CASE("class templates")
     {
         ValuePair vp1{42, 3.14}; // ValuePair<int, double>
 
-        ValuePair vp2{42, 42};  // ValuePair<int, int>
+        ValuePair vp2{42, 42}; // ValuePair<int, int>
 
         ValuePair vp3; // ValuePair<int, int>
         std::cout << vp3.to_string() << "\n";
@@ -110,12 +112,58 @@ TEST_CASE("class templates")
     }
 }
 
+template <typename T, size_t N>
+struct Array
+{
+    T items[N];
+
+    using iterator = T*;
+    using const_iterator = const T*;
+};
+
+template <typename TContainer>
+void print_items(TContainer& container)
+{
+    for (typename TContainer::iterator it = container.begin(); it != container.end(); ++it)
+    {
+        std::cout << *it << " ";
+    }
+    std::cout << "\n";
+}
+
+TEST_CASE("tuple & dependent names")
+{
+    std::tuple<int, double> tpl1{1, 3.14};
+
+    REQUIRE(std::get<0>(tpl1) == 1);
+    // REQUIRE(tpl1.get<1>() == 3.14);
+}
+
+template <typename T>
+using Buffer = std::array<T, 1024>;
+
 TEST_CASE("template aliases")
 {
-    // TODO
+    Buffer<uint8_t> buffer;
+}
+
+template <typename T>
+constexpr T pi = 3.141592653589793238;
+
+namespace Explain
+{
+    template <typename T>
+    constexpr bool is_integral_v = std::is_integral<T>::value;
 }
 
 TEST_CASE("template variables")
 {
-    // TODO
+    const double pi_d = 3.141592653589793238;
+    const float pi_f = 3.141592653589793238;
+
+    std::cout << pi<double> << "\n";
+    std::cout << pi<float> << "\n";
+
+    static_assert(std::is_integral<int>::value);
+    static_assert(std::is_integral_v<int>); //  template variable
 }
