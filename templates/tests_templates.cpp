@@ -73,9 +73,10 @@ struct ValuePair
 
     ValuePair() = default;
 
-    ValuePair(T1 fst, T2 snd)
-        : first{fst}
-        , second{snd}
+    template <typename TFirst, typename TSecond>
+    ValuePair(TFirst&& fst, TSecond&& snd)
+        : first{std::forward<TFirst>(fst)}
+        , second{std::forward<TSecond>(snd)}
     { }
 
     std::string to_string() const
@@ -86,6 +87,10 @@ struct ValuePair
         return ss.str();
     }
 };
+
+// deduction guide - since C++17
+template <typename T1, typename T2>
+ValuePair(T1, T2) -> ValuePair<T1, T2>;
 
 TEST_CASE("class templates")
 {
@@ -103,6 +108,8 @@ TEST_CASE("class templates")
 
         ValuePair vp3; // ValuePair<int, int>
         std::cout << vp3.to_string() << "\n";
+
+        ValuePair vp4{"abc", 4};  // ValuePair<const char*, int>
 
         std::vector vec = {1, 2, 3, 4};
         std::array numbers = {1, 2, 3, 4, 5};
